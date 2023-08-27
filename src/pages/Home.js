@@ -10,8 +10,8 @@ export const Home = () => {
   const [rooms, setRooms] = useState([])
 
   useEffect(() => {
-    socket.on('SHARE_ROOMS', ({ rooms }) => {
-      containerRef.current && setRooms(rooms)
+    socket.on('SHARE_ROOMS', ({ rooms = [] } = {}) => {
+      if (containerRef.current) setRooms(rooms)
     })
   }, [])
 

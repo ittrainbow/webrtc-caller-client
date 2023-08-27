@@ -1,35 +1,27 @@
-import { useEffect } from 'react'
 import { useParams } from 'react-router'
 
-import { socket } from '../socket'
-import { useRTC } from '../hooks/useRTC'
+import { useWebRTC } from '../hooks/useWebRTC'
 
 export const Room = () => {
-  const { id: roomID } = useParams()
-  const { clients, provideMediaRef } = useRTC(roomID || '')
-
-  useEffect(() => {
-    socket.emit('JOIN_ROOM', { roomID })
-  }, [roomID])
+  const { id } = useParams()
+  const { clients, provideMediaRef } = useWebRTC(id)
 
   return (
-    <div>
-      Room
-      <div>
-        {clients.map((client) => {
-          return (
+    <div className="room-container">
+      {clients.map((clientID) => {
+        return (
+          <div key={clientID} id={clientID}>
             <video
               ref={(instance) => {
-                provideMediaRef(client, instance)
+                provideMediaRef(clientID, instance)
               }}
-              key={client}
               autoPlay
               playsInline
-              muted={client === 'LOCAL_VIDEO'}
+              muted={clientID === 'localStream'}
             />
-          )
-        })}
-      </div>
+          </div>
+        )
+      })}
     </div>
   )
 }
