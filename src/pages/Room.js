@@ -1,10 +1,12 @@
 import { useParams } from 'react-router'
 
 import { useWebRTC } from '../hooks/useWebRTC'
+import { useAppContext } from '../context/Context'
 
 export const Room = () => {
   const { id } = useParams()
-  const { clients, provideMediaRef } = useWebRTC(id)
+  const { clients } = useWebRTC(id)
+  const { mediaRef } = useAppContext()
 
   return (
     <div className="room-container">
@@ -13,7 +15,7 @@ export const Room = () => {
           <div key={clientID} id={clientID}>
             <video
               ref={(instance) => {
-                provideMediaRef(clientID, instance)
+                mediaRef(clientID, instance)
               }}
               autoPlay
               playsInline

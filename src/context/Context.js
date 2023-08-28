@@ -1,4 +1,4 @@
-import { useContext, createContext, useEffect, useState, useRef } from 'react'
+import { useContext, createContext, useEffect, useState, useRef, useCallback } from 'react'
 import { useLocation } from 'react-router'
 const Context = createContext()
 
@@ -12,7 +12,7 @@ export const ContextProvider = ({ children }) => {
   const userMediaElement = useRef(null)
   const peerMediaElements = useRef({ ['localStream']: null })
 
-  const stopUserMediaTracks = () => {
+  const stopUserMediaElementTracks = () => {
     userMediaElement.current?.getTracks().forEach((track) => track.stop())
   }
 
@@ -22,6 +22,10 @@ export const ContextProvider = ({ children }) => {
     delete peerMediaElements.current[peer]
   }
 
+  const mediaRef = useCallback((id, node) => {
+    peerMediaElements.current[id] = node
+  }, [])
+
   useEffect(() => {
     const { pathname } = location
     const id = pathname.split('/').slice(-1)[0]
@@ -30,7 +34,9 @@ export const ContextProvider = ({ children }) => {
   }, [location])
 
   return (
-    <Context.Provider value={{ room, peers, userMediaElement, stopUserMediaTracks, peerMediaElements, removePeer }}>
+    <Context.Provider
+      value={{ room, peers, userMediaElement, stopUserMediaElementTracks, peerMediaElements, removePeer, mediaRef }}
+    >
       {children}
     </Context.Provider>
   )

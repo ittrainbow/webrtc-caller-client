@@ -7,7 +7,7 @@ import { videoParams } from '../helpers/mediaParams'
 
 export const useWebRTC = (room) => {
   const [clients, updateClients] = useStateWithCallback([])
-  const { peers, userMediaElement, peerMediaElements, stopUserMediaTracks, removePeer } = useAppContext()
+  const { peers, userMediaElement, peerMediaElements, stopUserMediaElementTracks, removePeer } = useAppContext()
 
   const addNewClient = useCallback(
     (newClient, cb) => {
@@ -115,8 +115,7 @@ export const useWebRTC = (room) => {
     }
 
     const stopCapture = () => {
-      stopUserMediaTracks()
-      // userMediaElement.current?.getTracks().forEach((track) => track.stop())
+      stopUserMediaElementTracks()
       socket.emit('LEAVE_ROOM')
     }
 
@@ -124,9 +123,5 @@ export const useWebRTC = (room) => {
     return () => stopCapture()
   }, [room])
 
-  const provideMediaRef = useCallback((id, node) => {
-    peerMediaElements.current[id] = node
-  }, [])
-
-  return { clients, provideMediaRef }
+  return { clients }
 }
