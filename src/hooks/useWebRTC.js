@@ -3,6 +3,7 @@ import freeice from 'freeice'
 import useStateWithCallback from './useStateWithCallback'
 import { socket } from '../socket'
 import { useAppContext } from '../context/Context'
+import { videoParams } from '../helpers/mediaParams'
 
 export const useWebRTC = (room) => {
   const [clients, updateClients] = useStateWithCallback([])
@@ -112,10 +113,7 @@ export const useWebRTC = (room) => {
 
   useEffect(() => {
     const startCapture = async () => {
-      localMediaStream.current = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: { width: 320, height: 240 }
-      })
+      localMediaStream.current = await navigator.mediaDevices.getUserMedia(videoParams)
 
       addNewClient('localStream', () => {
         const localStream = peerMediaElements.current['localStream']

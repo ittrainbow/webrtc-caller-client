@@ -10,9 +10,7 @@ export const ContextProvider = ({ children }) => {
 
   const peerConnections = useRef({})
   const localMediaStream = useRef(null)
-  const peerMediaElements = useRef({
-    ['localStream']: null
-  })
+  const peerMediaElements = useRef({ ['localStream']: null })
 
   useEffect(() => {
     const { pathname } = location
