@@ -25,17 +25,23 @@ export const Home = () => {
   }
 
   return (
-    <div ref={containerRef}>
+    <div ref={containerRef} className="home-container">
       <h3>Rooms list</h3>
       <div>
         {rooms.map((room) => (
-          <div key={room} className="room-in-list">
+          <div key={room} className="home-string">
             {room}
-            <button onClick={() => handleJoinRoom(room)}>JOIN ROOM</button>
+            <button className="home-button" onClick={() => handleJoinRoom(room)}>
+              JOIN ROOM
+            </button>
           </div>
         ))}
       </div>
-      <button onClick={handleCreateRoom}>CREATE ROOM</button>
+      <div className="home-string">
+        <button className="home-button" onClick={handleCreateRoom}>
+          CREATE ROOM
+        </button>
+      </div>
     </div>
   )
 }

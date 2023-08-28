@@ -5,34 +5,44 @@ import { useAppContext } from '../context/Context'
 import { videoParams } from '../helpers/mediaParams'
 
 export const usePeers = (room) => {
-  const callbackRef = useRef(null)
-  const [clients, setClients] = useState([])
-  const { peers, userMediaElement, peerMediaElements, stopUserMediaElementTracks, removePeer } = useAppContext()
+  // const callbackRef = useRef(null)
+  const {
+    peers,
+    userMediaElement,
+    peerMediaElements,
+    stopUserMediaElementTracks,
+    removePeer,
+    clients,
+    updateClients,
+    addClient
+  } = useAppContext()
 
-  const updateClients = useCallback((newClients, callback) => {
-    callbackRef.current = callback
-    setClients(newClients)
-  }, [])
+  // const [clients, setClients] = useState([])
 
-  useEffect(() => {
-    if (callbackRef.current) {
-      callbackRef.current(clients)
-      callbackRef.current = null
-    }
-  }, [clients])
+  // const updateClients = useCallback((newClients, callback) => {
+  //   callbackRef.current = callback
+  //   setClients(newClients)
+  // }, [])
 
-  const addClient = useCallback(
-    (newClient, callback) => {
-      updateClients((clients) => {
-        if (!clients.includes(newClient)) {
-          return [...clients, newClient]
-        }
+  // useEffect(() => {
+  //   if (callbackRef.current) {
+  //     callbackRef.current(clients)
+  //     callbackRef.current = null
+  //   }
+  // }, [clients])
 
-        return clients
-      }, callback)
-    },
-    [updateClients]
-  )
+  // const addClient = useCallback(
+  //   (newClient, callback) => {
+  //     updateClients((clients) => {
+  //       if (!clients.includes(newClient)) {
+  //         return [...clients, newClient]
+  //       }
+
+  //       return clients
+  //     }, callback)
+  //   },
+  //   [updateClients]
+  // )
 
   useEffect(() => {
     const handleAddPeer = async ({ peer, shouldCreateOffer }) => {

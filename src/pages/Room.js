@@ -5,15 +5,16 @@ import { useAppContext } from '../context/Context'
 
 export const Room = () => {
   const { id } = useParams()
-  const peerlist = usePeers(id)
-  const { mediaRef } = useAppContext()
+  const peers = usePeers(id)
+  const { mediaRef, clients } = useAppContext()
 
   return (
     <div className="room-container">
-      {peerlist.map((peer) => {
+      {clients.map((peer) => {
         return (
           <div key={peer} id={peer}>
             <video
+              className="room-video"
               ref={(instance) => {
                 mediaRef(peer, instance)
               }}
