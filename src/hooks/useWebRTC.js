@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useCallback } from 'react'
 import freeice from 'freeice'
 import useStateWithCallback from './useStateWithCallback'
 import { socket } from '../socket'
@@ -7,7 +7,7 @@ import { videoParams } from '../helpers/mediaParams'
 
 export const useWebRTC = (room) => {
   const [clients, updateClients] = useStateWithCallback([])
-  // const { peers, userMediaElement, peerMediaElements, userMediaElement } = useAppContext()
+  const { peers, userMediaElement, peerMediaElements, stopUserMediaTracks, removePeer } = useAppContext()
 
   const addNewClient = useCallback(
     (newClient, cb) => {
@@ -22,16 +22,8 @@ export const useWebRTC = (room) => {
     [clients, updateClients]
   )
 
-  const peers = useRef({})
-  const userMediaElement = useRef(null)
-  const peerMediaElements = useRef({ ['localStream']: null })
-
   useEffect(() => {
-    const handleNewPeer = async ({ peer, shouldCreateOffer }) => {
-      if (peer in peers.current) {
-        return
-      }
-
+    const handleAddPeer = async ({ peer, shouldCreateOffer }) => {
       peers.current[peer] = new RTCPeerConnection({ iceServers: freeice() })
 
       peers.current[peer].onicecandidate = (event) => {
@@ -65,7 +57,7 @@ export const useWebRTC = (room) => {
       }
     }
 
-    socket.on('ADD_PEER', handleNewPeer)
+    socket.on('ADD_PEER', handleAddPeer)
     return () => socket.off('ADD_PEER')
   }, [])
 
@@ -88,7 +80,7 @@ export const useWebRTC = (room) => {
 
   useEffect(() => {
     socket.on('ICE_CANDIDATE', ({ peer, iceCandidate }) => {
-      peers.current[peer]?.addIceCandidate(new RTCIceCandidate(iceCandidate))
+      peers.current[peer].addIceCandidate(new RTCIceCandidate(iceCandidate))
     })
 
     return () => socket.off('ICE_CANDIDATE')
@@ -96,18 +88,13 @@ export const useWebRTC = (room) => {
 
   useEffect(() => {
     const handleRemovePeer = ({ peer }) => {
-      if (peers.current[peer]) {
-        peers.current[peer].close()
-      }
-
-      delete peers.current[peer]
-      delete peerMediaElements.current[peer]
-
-      updateClients((list) => list.filter((c) => c !== peer))
+      removePeer(peer)
+      updateClients((list) => {
+        return list.filter((client) => client !== peer)
+      })
     }
 
     socket.on('REMOVE_PEER', handleRemovePeer)
-
     return () => socket.off('REMOVE_PEER')
   }, [])
 
@@ -128,7 +115,8 @@ export const useWebRTC = (room) => {
     }
 
     const stopCapture = () => {
-      userMediaElement.current?.getTracks().forEach((track) => track.stop())
+      stopUserMediaTracks()
+      // userMediaElement.current?.getTracks().forEach((track) => track.stop())
       socket.emit('LEAVE_ROOM')
     }
 

@@ -42,9 +42,5 @@ export const useCamera = () => {
     socket.emit('LEAVE_ROOM')
   }
 
-  useEffect(() => {
-    console.log(100, clients)
-  }, [clients])
-
   return { clients, startCapture, stopCapture }
 }
