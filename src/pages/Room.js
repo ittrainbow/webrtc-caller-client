@@ -5,23 +5,21 @@ import { useAppContext } from '../context/Context'
 
 export const Room = () => {
   const { id } = useParams()
-  const { clients } = usePeers(id)
-  // usePeers(id)
-  // const { clients } = useAppContext()
+  const peerlist = usePeers(id)
   const { mediaRef } = useAppContext()
 
   return (
     <div className="room-container">
-      {clients.map((clientID) => {
+      {peerlist.map((peer) => {
         return (
-          <div key={clientID} id={clientID}>
+          <div key={peer} id={peer}>
             <video
               ref={(instance) => {
-                mediaRef(clientID, instance)
+                mediaRef(peer, instance)
               }}
               autoPlay
               playsInline
-              muted={clientID === 'localStream'}
+              muted={peer === 'localStream'}
             />
           </div>
         )

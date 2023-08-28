@@ -7,7 +7,6 @@ export const useAppContext = () => useContext(Context)
 export const ContextProvider = ({ children }) => {
   const peers = useRef({})
   const userMediaElement = useRef({})
-  // const peerMediaElements = useRef({ ['localStream']: null })
   const peerMediaElements = useRef({})
 
   const stopUserMediaElementTracks = () => {
