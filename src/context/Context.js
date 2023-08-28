@@ -1,16 +1,16 @@
 import { useContext, createContext, useEffect, useState, useRef, useCallback } from 'react'
 import { useLocation } from 'react-router'
+import useStateWithCallback from '../hooks/useStateWithCallback'
+
 const Context = createContext()
 
 export const useAppContext = () => useContext(Context)
 
 export const ContextProvider = ({ children }) => {
-  const location = useLocation()
-  const [room, setRoom] = useState(null)
-
   const peers = useRef({})
-  const userMediaElement = useRef(null)
-  const peerMediaElements = useRef({ ['localStream']: null })
+  const userMediaElement = useRef({})
+  // const peerMediaElements = useRef({ ['localStream']: null })
+  const peerMediaElements = useRef({})
 
   const stopUserMediaElementTracks = () => {
     userMediaElement.current?.getTracks().forEach((track) => track.stop())
@@ -26,16 +26,33 @@ export const ContextProvider = ({ children }) => {
     peerMediaElements.current[id] = node
   }, [])
 
-  useEffect(() => {
-    const { pathname } = location
-    const id = pathname.split('/').slice(-1)[0]
-    const room = !!id.length ? id : null
-    setRoom(room)
-  }, [location])
+  const [clients, updateClients] = useStateWithCallback([])
+  const addClient = useCallback(
+    (newClient, callback) => {
+      updateClients((clients) => {
+        if (!clients.includes(newClient)) {
+          return [...clients, newClient]
+        }
+
+        return clients
+      }, callback)
+    },
+    [clients, updateClients]
+  )
 
   return (
     <Context.Provider
-      value={{ room, peers, userMediaElement, stopUserMediaElementTracks, peerMediaElements, removePeer, mediaRef }}
+      value={{
+        peers,
+        userMediaElement,
+        stopUserMediaElementTracks,
+        peerMediaElements,
+        removePeer,
+        mediaRef,
+        clients,
+        updateClients,
+        addClient
+      }}
     >
       {children}
     </Context.Provider>

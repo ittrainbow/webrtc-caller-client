@@ -6,18 +6,28 @@ import { useAppContext } from '../context/Context'
 import { videoParams } from '../helpers/mediaParams'
 
 export const useWebRTC = (room) => {
-  const [clients, updateClients] = useStateWithCallback([])
-  const { peers, userMediaElement, peerMediaElements, stopUserMediaElementTracks, removePeer } = useAppContext()
+  const {
+    peers,
+    userMediaElement,
+    peerMediaElements,
+    stopUserMediaElementTracks,
+    removePeer
+    // clients,
+    // updateClients,
+    // addClient
+  } = useAppContext()
 
-  const addNewClient = useCallback(
-    (newClient, cb) => {
-      updateClients((list) => {
-        if (!list.includes(newClient)) {
-          return [...list, newClient]
+  const [clients, updateClients] = useStateWithCallback([])
+
+  const addClient = useCallback(
+    (newClient, callback) => {
+      updateClients((clients) => {
+        if (!clients.includes(newClient)) {
+          return [...clients, newClient]
         }
 
-        return list
-      }, cb)
+        return clients
+      }, callback)
     },
     [clients, updateClients]
   )
@@ -37,7 +47,7 @@ export const useWebRTC = (room) => {
 
         if (tracksNumber === 2) {
           tracksNumber = 0
-          addNewClient(peer, () => {
+          addClient(peer, () => {
             if (peerMediaElements.current[peer]) {
               peerMediaElements.current[peer].srcObject = remoteStream
             }
@@ -76,7 +86,7 @@ export const useWebRTC = (room) => {
 
     socket.on('SESSION_DESCRIPTION', handleRemoteMedia)
     return () => socket.off('SESSION_DESCRIPTION')
-  }, [])
+  }, [room])
 
   useEffect(() => {
     socket.on('ICE_CANDIDATE', ({ peer, iceCandidate }) => {
@@ -89,20 +99,20 @@ export const useWebRTC = (room) => {
   useEffect(() => {
     const handleRemovePeer = ({ peer }) => {
       removePeer(peer)
-      updateClients((list) => {
-        return list.filter((client) => client !== peer)
+      updateClients((clients) => {
+        return clients.filter((client) => client !== peer)
       })
     }
 
     socket.on('REMOVE_PEER', handleRemovePeer)
     return () => socket.off('REMOVE_PEER')
-  }, [])
+  }, [clients])
 
   useEffect(() => {
     const startCapture = async () => {
       userMediaElement.current = await navigator.mediaDevices.getUserMedia(videoParams)
 
-      addNewClient('localStream', () => {
+      addClient('localStream', () => {
         const localStream = peerMediaElements.current['localStream']
 
         if (localStream) {
