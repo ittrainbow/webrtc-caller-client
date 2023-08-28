@@ -7,7 +7,7 @@ import { videoParams } from '../helpers/mediaParams'
 
 export const useWebRTC = (room) => {
   const [clients, updateClients] = useStateWithCallback([])
-  // const { peerConnections, localMediaStream, peerMediaElements } = useAppContext()
+  // const { peers, userMediaElement, peerMediaElements, userMediaElement } = useAppContext()
 
   const addNewClient = useCallback(
     (newClient, cb) => {
@@ -22,25 +22,25 @@ export const useWebRTC = (room) => {
     [clients, updateClients]
   )
 
-  const peerConnections = useRef({})
-  const localMediaStream = useRef(null)
+  const peers = useRef({})
+  const userMediaElement = useRef(null)
   const peerMediaElements = useRef({ ['localStream']: null })
 
   useEffect(() => {
     const handleNewPeer = async ({ peer, shouldCreateOffer }) => {
-      if (peer in peerConnections.current) {
+      if (peer in peers.current) {
         return
       }
 
-      peerConnections.current[peer] = new RTCPeerConnection({ iceServers: freeice() })
+      peers.current[peer] = new RTCPeerConnection({ iceServers: freeice() })
 
-      peerConnections.current[peer].onicecandidate = (event) => {
+      peers.current[peer].onicecandidate = (event) => {
         const iceCandidate = event.candidate
         iceCandidate && socket.emit('RELAY_ICE', { peer, iceCandidate })
       }
 
       let tracksNumber = 0
-      peerConnections.current[peer].ontrack = ({ streams: [remoteStream] }) => {
+      peers.current[peer].ontrack = ({ streams: [remoteStream] }) => {
         tracksNumber++
 
         if (tracksNumber === 2) {
@@ -53,14 +53,14 @@ export const useWebRTC = (room) => {
         }
       }
 
-      localMediaStream.current?.getTracks().forEach((track) => {
-        peerConnections.current[peer].addTrack(track, localMediaStream.current)
+      userMediaElement.current?.getTracks().forEach((track) => {
+        peers.current[peer].addTrack(track, userMediaElement.current)
       })
 
       if (shouldCreateOffer) {
-        const offer = await peerConnections.current[peer].createOffer()
+        const offer = await peers.current[peer].createOffer()
         const sessionDescription = offer
-        await peerConnections.current[peer].setLocalDescription(offer)
+        await peers.current[peer].setLocalDescription(offer)
         socket.emit('RELAY_SDP', { peer, sessionDescription })
       }
     }
@@ -72,11 +72,11 @@ export const useWebRTC = (room) => {
   useEffect(() => {
     const handleRemoteMedia = async ({ peer, sessionDescription }) => {
       const { type } = sessionDescription
-      await peerConnections.current[peer].setRemoteDescription(new RTCSessionDescription(sessionDescription))
+      await peers.current[peer].setRemoteDescription(new RTCSessionDescription(sessionDescription))
 
       if (type === 'offer') {
-        const answer = await peerConnections.current[peer].createAnswer()
-        await peerConnections.current[peer].setLocalDescription(answer)
+        const answer = await peers.current[peer].createAnswer()
+        await peers.current[peer].setLocalDescription(answer)
         const sessionDescription = answer
         socket.emit('RELAY_SDP', { peer, sessionDescription })
       }
@@ -88,7 +88,7 @@ export const useWebRTC = (room) => {
 
   useEffect(() => {
     socket.on('ICE_CANDIDATE', ({ peer, iceCandidate }) => {
-      peerConnections.current[peer]?.addIceCandidate(new RTCIceCandidate(iceCandidate))
+      peers.current[peer]?.addIceCandidate(new RTCIceCandidate(iceCandidate))
     })
 
     return () => socket.off('ICE_CANDIDATE')
@@ -96,11 +96,11 @@ export const useWebRTC = (room) => {
 
   useEffect(() => {
     const handleRemovePeer = ({ peer }) => {
-      if (peerConnections.current[peer]) {
-        peerConnections.current[peer].close()
+      if (peers.current[peer]) {
+        peers.current[peer].close()
       }
 
-      delete peerConnections.current[peer]
+      delete peers.current[peer]
       delete peerMediaElements.current[peer]
 
       updateClients((list) => list.filter((c) => c !== peer))
@@ -113,14 +113,14 @@ export const useWebRTC = (room) => {
 
   useEffect(() => {
     const startCapture = async () => {
-      localMediaStream.current = await navigator.mediaDevices.getUserMedia(videoParams)
+      userMediaElement.current = await navigator.mediaDevices.getUserMedia(videoParams)
 
       addNewClient('localStream', () => {
         const localStream = peerMediaElements.current['localStream']
 
         if (localStream) {
           localStream.volume = 0
-          localStream.srcObject = localMediaStream.current
+          localStream.srcObject = userMediaElement.current
         }
       })
 
@@ -128,7 +128,7 @@ export const useWebRTC = (room) => {
     }
 
     const stopCapture = () => {
-      localMediaStream.current?.getTracks().forEach((track) => track.stop())
+      userMediaElement.current?.getTracks().forEach((track) => track.stop())
       socket.emit('LEAVE_ROOM')
     }
 
@@ -140,8 +140,5 @@ export const useWebRTC = (room) => {
     peerMediaElements.current[id] = node
   }, [])
 
-  return {
-    clients,
-    provideMediaRef
-  }
+  return { clients, provideMediaRef }
 }

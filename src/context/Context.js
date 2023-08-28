@@ -8,9 +8,13 @@ export const ContextProvider = ({ children }) => {
   const location = useLocation()
   const [room, setRoom] = useState(null)
 
-  const peerConnections = useRef({})
-  const localMediaStream = useRef(null)
+  const peers = useRef({})
+  const userMediaElement = useRef(null)
   const peerMediaElements = useRef({ ['localStream']: null })
+
+  const stopUserMediaTracks = () => {
+    userMediaElement.current?.getTracks().forEach((track) => track.stop())
+  }
 
   useEffect(() => {
     const { pathname } = location
@@ -20,7 +24,7 @@ export const ContextProvider = ({ children }) => {
   }, [location])
 
   return (
-    <Context.Provider value={{ room, peerConnections, localMediaStream, peerMediaElements }}>
+    <Context.Provider value={{ room, peers, userMediaElement, stopUserMediaTracks, peerMediaElements }}>
       {children}
     </Context.Provider>
   )
