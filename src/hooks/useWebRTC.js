@@ -2,9 +2,11 @@ import { useEffect, useRef, useCallback } from 'react'
 import freeice from 'freeice'
 import useStateWithCallback from './useStateWithCallback'
 import { socket } from '../socket'
+import { useAppContext } from '../context/Context'
 
 export const useWebRTC = (roomID) => {
   const [clients, updateClients] = useStateWithCallback([])
+  const { peerConnections, localMediaStream, peerMediaElements } = useAppContext()
 
   const addNewClient = useCallback(
     (newClient, cb) => {
@@ -19,11 +21,11 @@ export const useWebRTC = (roomID) => {
     [clients, updateClients]
   )
 
-  const peerConnections = useRef({})
-  const localMediaStream = useRef(null)
-  const peerMediaElements = useRef({
-    ['localStream']: null
-  })
+  // const peerConnections = useRef({})
+  // const localMediaStream = useRef(null)
+  // const peerMediaElements = useRef({
+  //   ['localStream']: null
+  // })
 
   useEffect(() => {
     const handleNewPeer = async ({ peerID, shouldCreateOffer }) => {
@@ -51,20 +53,6 @@ export const useWebRTC = (roomID) => {
             if (peerMediaElements.current[peerID]) {
               peerMediaElements.current[peerID].srcObject = remoteStream
             }
-            // else {
-            //   // FIX LONG RENDER IN CASE OF MANY CLIENTS
-            //   let settled = false
-            //   const interval = setInterval(() => {
-            //     if (peerMediaElements.current[peerID]) {
-            //       peerMediaElements.current[peerID].srcObject = remoteStream
-            //       settled = true
-            //     }
-
-            //     if (settled) {
-            //       clearInterval(interval)
-            //     }
-            //   }, 1000)
-            // }
           })
         }
       }
@@ -155,8 +143,7 @@ export const useWebRTC = (roomID) => {
       .catch((e) => console.error('Error getting userMedia:', e))
 
     return () => {
-      localMediaStream.current.getTracks().forEach((track) => track.stop())
-
+      localMediaStream.current?.getTracks().forEach((track) => track.stop())
       socket.emit('LEAVE_ROOM')
     }
   }, [roomID])
