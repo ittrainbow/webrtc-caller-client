@@ -1,6 +1,6 @@
 import { useEffect, useCallback } from 'react'
 import freeice from 'freeice'
-import useStateWithCallback from './useStateWithCallback'
+import { useStateWithCallback } from './useStateWithCallback'
 import { socket } from '../socket'
 import { useAppContext } from '../context/Context'
 import { videoParams } from '../helpers/mediaParams'
@@ -17,11 +17,11 @@ export const usePeers = (room) => {
     // addClient
   } = useAppContext()
 
-  const [clients, updateClients] = useStateWithCallback([])
+  const [clients, setClients] = useStateWithCallback([])
 
   const addClient = useCallback(
     (newClient, callback) => {
-      updateClients((clients) => {
+      setClients((clients) => {
         if (!clients.includes(newClient)) {
           return [...clients, newClient]
         }
@@ -29,7 +29,7 @@ export const usePeers = (room) => {
         return clients
       }, callback)
     },
-    [clients, updateClients]
+    [clients, setClients]
   )
 
   useEffect(() => {
@@ -99,7 +99,7 @@ export const usePeers = (room) => {
   useEffect(() => {
     const handleRemovePeer = ({ peer }) => {
       removePeer(peer)
-      updateClients((clients) => {
+      setClients((clients) => {
         return clients.filter((client) => client !== peer)
       })
     }

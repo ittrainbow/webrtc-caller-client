@@ -6,6 +6,8 @@ import { useAppContext } from '../context/Context'
 export const Room = () => {
   const { id } = useParams()
   const { clients } = usePeers(id)
+  // usePeers(id)
+  // const { clients } = useAppContext()
   const { mediaRef } = useAppContext()
 
   return (

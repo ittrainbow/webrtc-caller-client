@@ -1,5 +1,4 @@
-import { useContext, createContext, useRef, useCallback } from 'react'
-import useStateWithCallback from '../hooks/useStateWithCallback'
+import { useContext, createContext, useRef } from 'react'
 
 const Context = createContext()
 
@@ -23,21 +22,6 @@ export const ContextProvider = ({ children }) => {
 
   const mediaRef = (id, node) => (peerMediaElements.current[id] = node)
 
-  const [clients, updateClients] = useStateWithCallback([])
-  
-  const addClient = useCallback(
-    (newClient, callback) => {
-      updateClients((clients) => {
-        if (!clients.includes(newClient)) {
-          return [...clients, newClient]
-        }
-
-        return clients
-      }, callback)
-    },
-    [clients, updateClients]
-  )
-
   return (
     <Context.Provider
       value={{
@@ -46,10 +30,7 @@ export const ContextProvider = ({ children }) => {
         stopUserMediaElementTracks,
         peerMediaElements,
         removePeer,
-        mediaRef,
-        clients,
-        updateClients,
-        addClient
+        mediaRef
       }}
     >
       {children}
