@@ -1,11 +1,11 @@
 import { useParams } from 'react-router'
 
-import { useWebRTC } from '../hooks/useWebRTC'
+import { usePeers } from '../hooks/usePeers'
 import { useAppContext } from '../context/Context'
 
 export const Room = () => {
   const { id } = useParams()
-  const { clients } = useWebRTC(id)
+  const { clients } = usePeers(id)
   const { mediaRef } = useAppContext()
 
   return (

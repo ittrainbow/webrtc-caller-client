@@ -5,7 +5,7 @@ import { socket } from '../socket'
 import { useAppContext } from '../context/Context'
 import { videoParams } from '../helpers/mediaParams'
 
-export const useWebRTC = (room) => {
+export const usePeers = (room) => {
   const {
     peers,
     userMediaElement,
