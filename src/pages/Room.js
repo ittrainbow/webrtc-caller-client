@@ -7,7 +7,7 @@ import { useCamera, usePeers } from '../hooks'
 export const Room = () => {
   const { id } = useParams()
   const { cameraOn, cameraOff } = useCamera(id)
-  const { mediaRef, clients } = useAppContext()
+  const { mediaRef, users } = useAppContext()
 
   usePeers(id)
 
@@ -15,11 +15,11 @@ export const Room = () => {
     cameraOn()
     return () => cameraOff()
     // eslint-disable-next-line
-  }, [id])
+  }, [])
 
   return (
     <div className="room-container">
-      {clients.map((peer) => {
+      {users.map((peer) => {
         return (
           <div key={peer} id={peer}>
             <video

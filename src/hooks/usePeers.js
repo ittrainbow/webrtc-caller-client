@@ -1,32 +1,28 @@
 import { useEffect } from 'react'
-import freeice from 'freeice'
 
+import { iceServers } from '../helpers/iceServers'
 import { useAppContext } from '../context/Context'
 import { socket } from '../socket'
 
 export const usePeers = (room) => {
-  const { peers, userMediaElement, peerMediaElements, removePeer, clients, updateClients, addClient } = useAppContext()
+  const { peers, userMediaElement, peerMediaElements, removePeer, users, updateUsers, addUser } = useAppContext()
 
   useEffect(() => {
     const handleAddPeer = async ({ peer, shouldCreateOffer }) => {
-      peers.current[peer] = new RTCPeerConnection({ iceServers: freeice() })
+      peers.current[peer] = new RTCPeerConnection({ iceServers })
 
       peers.current[peer].onicecandidate = (event) => {
         const iceCandidate = event.candidate
         iceCandidate && socket.emit('transmit_ice', { peer, iceCandidate })
       }
 
-      let tracksNumber = 0
       peers.current[peer].ontrack = ({ streams: [remoteStream] }) => {
-        tracksNumber++
-
-        if (tracksNumber === 2) {
-          tracksNumber = 0
-          const addPeer = () => {
-            if (peerMediaElements.current[peer]) peerMediaElements.current[peer].srcObject = remoteStream
+        const addPeer = () => {
+          if (peerMediaElements.current[peer]) {
+            peerMediaElements.current[peer].srcObject = remoteStream
           }
-          addClient(peer, addPeer)
         }
+        addUser(peer, addPeer)
       }
 
       userMediaElement.current?.getTracks().forEach((track) => {
@@ -65,25 +61,23 @@ export const usePeers = (room) => {
   }, [room])
 
   useEffect(() => {
-    socket.on('emit_ice', ({ peer, iceCandidate }) => {
+    const handleIceCandidate = ({ peer, iceCandidate }) => {
       peers.current[peer].addIceCandidate(new RTCIceCandidate(iceCandidate))
-    })
-
-    return () => socket.off('emit_ice')
+    }
+    
+    socket.on('emit_ice', handleIceCandidate)
   }, [peers])
 
   useEffect(() => {
     const handleRemovePeer = ({ peer }) => {
       removePeer(peer)
-      updateClients((clients) => {
-        const newClients = clients.filter((client) => client !== peer)
-        return newClients
+      updateUsers((users) => {
+        const newUsers = users.filter((user) => user !== peer)
+        return newUsers
       })
     }
 
     socket.on('remove_peer', handleRemovePeer)
     // eslint-disable-next-line
-  }, [clients])
-
-  return clients
+  }, [users])
 }

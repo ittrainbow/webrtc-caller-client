@@ -4,6 +4,7 @@ export const Context = createContext()
 export const useAppContext = () => useContext(Context)
 
 export const ContextProvider = ({ children }) => {
+  const [users, setUsers] = useState([])
   const peerMediaElements = useRef({})
   const userMediaElement = useRef({})
   const callbackRef = useRef(null)
@@ -21,32 +22,23 @@ export const ContextProvider = ({ children }) => {
 
   const mediaRef = (id, node) => (peerMediaElements.current[id] = node)
 
-  const [clients, setClients] = useState([])
-
-  const updateClients = useCallback((newClients, callback) => {
+  const updateUsers = useCallback((newUsers, callback) => {
     callbackRef.current = callback
-    setClients(newClients)
+    setUsers(newUsers)
   }, [])
 
   useEffect(() => {
     if (callbackRef.current) {
-      callbackRef.current(clients)
+      callbackRef.current(users)
       callbackRef.current = null
     }
-  }, [clients])
+  }, [users])
 
-  const addClient = useCallback(
-    (newClient, callback) => {
-      updateClients((clients) => {
-        if (!clients.includes(newClient)) {
-          return [...clients, newClient]
-        }
-
-        return clients
-      }, callback)
-    },
-    [updateClients]
-  )
+  const addUser = (newUser, callback) => {
+    updateUsers((users) => {
+      return users.includes(newUser) ? users : [...users, newUser]
+    }, callback)
+  }
 
   return (
     <Context.Provider
@@ -57,10 +49,10 @@ export const ContextProvider = ({ children }) => {
         peerMediaElements,
         removePeer,
         mediaRef,
-        clients,
-        setClients,
-        updateClients,
-        addClient
+        users,
+        setUsers,
+        updateUsers,
+        addUser
       }}
     >
       {children}

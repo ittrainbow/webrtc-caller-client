@@ -2,7 +2,7 @@ import { useAppContext } from '../context/Context'
 import { socket } from '../socket'
 
 export const useCamera = (room) => {
-  const { userMediaElement, peerMediaElements, addClient, stopUserMediaElementTracks } = useAppContext()
+  const { userMediaElement, peerMediaElements, addUser, stopUserMediaElementTracks } = useAppContext()
 
   const cameraOn = async () => {
     userMediaElement.current = await navigator.mediaDevices.getUserMedia({
@@ -17,8 +17,8 @@ export const useCamera = (room) => {
       peerMediaElements.current[socket.id].volume = 0
       peerMediaElements.current[socket.id].srcObject = userMediaElement.current
     }
-    
-    addClient(socket.id, addLocal)
+
+    addUser(socket.id, addLocal)
 
     socket.emit('join_room', { room })
   }
