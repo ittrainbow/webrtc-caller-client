@@ -6,7 +6,7 @@ import { useAppContext } from '../context/Context'
 
 export const useWebRTC = (roomID) => {
   const [clients, updateClients] = useStateWithCallback([])
-  const { peerConnections, localMediaStream, peerMediaElements } = useAppContext()
+  // const { peerConnections, localMediaStream, peerMediaElements } = useAppContext()
 
   const addNewClient = useCallback(
     (newClient, cb) => {
@@ -21,21 +21,17 @@ export const useWebRTC = (roomID) => {
     [clients, updateClients]
   )
 
-  // const peerConnections = useRef({})
-  // const localMediaStream = useRef(null)
-  // const peerMediaElements = useRef({
-  //   ['localStream']: null
-  // })
+  const peerConnections = useRef({})
+  const localMediaStream = useRef(null)
+  const peerMediaElements = useRef({ ['localStream']: null })
 
   useEffect(() => {
     const handleNewPeer = async ({ peerID, shouldCreateOffer }) => {
       if (peerID in peerConnections.current) {
-        return console.warn(`Already connected to peer ${peerID}`)
+        return
       }
 
-      peerConnections.current[peerID] = new RTCPeerConnection({
-        iceServers: freeice()
-      })
+      peerConnections.current[peerID] = new RTCPeerConnection({ iceServers: freeice() })
 
       peerConnections.current[peerID].onicecandidate = (event) => {
         const iceCandidate = event.candidate
@@ -43,11 +39,10 @@ export const useWebRTC = (roomID) => {
       }
 
       let tracksNumber = 0
-      peerConnections.current[peerID].ontrack = ({ streams: [remoteStream], index }) => {
+      peerConnections.current[peerID].ontrack = ({ streams: [remoteStream] }) => {
         tracksNumber++
 
         if (tracksNumber === 2) {
-          // video & audio tracks received
           tracksNumber = 0
           addNewClient(peerID, () => {
             if (peerMediaElements.current[peerID]) {
@@ -74,10 +69,11 @@ export const useWebRTC = (roomID) => {
   }, [])
 
   useEffect(() => {
-    async function setRemoteMedia({ peerID, sessionDescription: remoteDescription }) {
-      await peerConnections.current[peerID]?.setRemoteDescription(new RTCSessionDescription(remoteDescription))
+    const handleRemoteMedia = async ({ peerID, sessionDescription }) => {
+      const { type } = sessionDescription
+      await peerConnections.current[peerID].setRemoteDescription(new RTCSessionDescription(sessionDescription))
 
-      if (remoteDescription.type === 'offer') {
+      if (type === 'offer') {
         const answer = await peerConnections.current[peerID].createAnswer()
         await peerConnections.current[peerID].setLocalDescription(answer)
         const sessionDescription = answer
@@ -85,7 +81,7 @@ export const useWebRTC = (roomID) => {
       }
     }
 
-    socket.on('SESSION_DESCRIPTION', setRemoteMedia)
+    socket.on('SESSION_DESCRIPTION', handleRemoteMedia)
     return () => socket.off('SESSION_DESCRIPTION')
   }, [])
 
@@ -94,9 +90,7 @@ export const useWebRTC = (roomID) => {
       peerConnections.current[peerID]?.addIceCandidate(new RTCIceCandidate(iceCandidate))
     })
 
-    return () => {
-      socket.off('ICE_CANDIDATE')
-    }
+    return () => socket.off('ICE_CANDIDATE')
   }, [])
 
   useEffect(() => {
@@ -113,39 +107,35 @@ export const useWebRTC = (roomID) => {
 
     socket.on('REMOVE_PEER', handleRemovePeer)
 
-    return () => {
-      socket.off('REMOVE_PEER')
-    }
+    return () => socket.off('REMOVE_PEER')
   }, [])
 
   useEffect(() => {
-    async function startCapture() {
+    const startCapture = async () => {
       localMediaStream.current = await navigator.mediaDevices.getUserMedia({
         audio: true,
-        video: {
-          width: 320,
-          height: 240
-        }
+        video: { width: 320, height: 240 }
       })
 
       addNewClient('localStream', () => {
-        const localVideoElement = peerMediaElements.current['localStream']
+        const localStream = peerMediaElements.current['localStream']
 
-        if (localVideoElement) {
-          localVideoElement.volume = 0
-          localVideoElement.srcObject = localMediaStream.current
+        if (localStream) {
+          localStream.volume = 0
+          localStream.srcObject = localMediaStream.current
         }
       })
+
+      socket.emit('JOIN_ROOM', { roomID })
     }
 
-    startCapture()
-      .then(() => socket.emit('JOIN_ROOM', { roomID }))
-      .catch((e) => console.error('Error getting userMedia:', e))
-
-    return () => {
+    const stopCapture = () => {
       localMediaStream.current?.getTracks().forEach((track) => track.stop())
       socket.emit('LEAVE_ROOM')
     }
+
+    startCapture()
+    return () => stopCapture()
   }, [roomID])
 
   const provideMediaRef = useCallback((id, node) => {
