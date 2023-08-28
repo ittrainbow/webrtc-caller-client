@@ -1,18 +1,11 @@
 import { useEffect } from 'react'
 import freeice from 'freeice'
-import { socket } from '../socket'
+
 import { useAppContext } from '../context/Context'
+import { socket } from '../socket'
 
 export const usePeers = (room) => {
-  const {
-    peers,
-    userMediaElement,
-    peerMediaElements,
-    removePeer,
-    clients,
-    updateClients,
-    addClient
-  } = useAppContext()
+  const { peers, userMediaElement, peerMediaElements, removePeer, clients, updateClients, addClient } = useAppContext()
 
   useEffect(() => {
     const handleAddPeer = async ({ peer, shouldCreateOffer }) => {
@@ -20,7 +13,7 @@ export const usePeers = (room) => {
 
       peers.current[peer].onicecandidate = (event) => {
         const iceCandidate = event.candidate
-        iceCandidate && socket.emit('RELAY_ICE', { peer, iceCandidate })
+        iceCandidate && socket.emit('transmit_ice', { peer, iceCandidate })
       }
 
       let tracksNumber = 0
@@ -44,17 +37,17 @@ export const usePeers = (room) => {
         const offer = await peers.current[peer].createOffer()
         const sessionDescription = offer
         await peers.current[peer].setLocalDescription(offer)
-        socket.emit('RELAY_SDP', { peer, sessionDescription })
+        socket.emit('transmit_sdp', { peer, sessionDescription })
       }
     }
 
-    socket.on('ADD_PEER', handleAddPeer)
-    return () => socket.off('ADD_PEER')
+    socket.on('add_peer', handleAddPeer)
+    return () => socket.off('add_peer')
     // eslint-disable-next-line
   }, [])
 
   useEffect(() => {
-    const handleRemoteMedia = async ({ peer, sessionDescription }) => {
+    const handleRemotePeerMedia = async ({ peer, sessionDescription }) => {
       const { type } = sessionDescription
       await peers.current[peer].setRemoteDescription(new RTCSessionDescription(sessionDescription))
 
@@ -62,21 +55,21 @@ export const usePeers = (room) => {
         const answer = await peers.current[peer].createAnswer()
         await peers.current[peer].setLocalDescription(answer)
         const sessionDescription = answer
-        socket.emit('RELAY_SDP', { peer, sessionDescription })
+        socket.emit('transmit_sdp', { peer, sessionDescription })
       }
     }
 
-    socket.on('SESSION_DESCRIPTION', handleRemoteMedia)
-    return () => socket.off('SESSION_DESCRIPTION')
+    socket.on('emit_sdp', handleRemotePeerMedia)
+    return () => socket.off('emit_sdp')
     // eslint-disable-next-line
   }, [room])
 
   useEffect(() => {
-    socket.on('ICE_CANDIDATE', ({ peer, iceCandidate }) => {
+    socket.on('emit_ice', ({ peer, iceCandidate }) => {
       peers.current[peer].addIceCandidate(new RTCIceCandidate(iceCandidate))
     })
 
-    return () => socket.off('ICE_CANDIDATE')
+    return () => socket.off('emit_ice')
   }, [peers])
 
   useEffect(() => {
@@ -88,7 +81,7 @@ export const usePeers = (room) => {
       })
     }
 
-    socket.on('REMOVE_PEER', handleRemovePeer)
+    socket.on('remove_peer', handleRemovePeer)
     // eslint-disable-next-line
   }, [clients])
 

@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
-import { Room, Home, NotFound } from '../pages'
 import { ContextProvider } from '../context/Context'
+import { Room, Home, NotFound } from '../pages'
 
 export const Router = () => {
   return (

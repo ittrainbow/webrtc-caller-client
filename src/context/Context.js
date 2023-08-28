@@ -1,14 +1,13 @@
 import { useContext, createContext, useRef, useState, useCallback, useEffect } from 'react'
 
-const Context = createContext()
-
+export const Context = createContext()
 export const useAppContext = () => useContext(Context)
 
 export const ContextProvider = ({ children }) => {
-  const peers = useRef({})
-  const callbackRef = useRef(null)
-  const userMediaElement = useRef({})
   const peerMediaElements = useRef({})
+  const userMediaElement = useRef({})
+  const callbackRef = useRef(null)
+  const peers = useRef({})
 
   const stopUserMediaElementTracks = () => {
     userMediaElement.current?.getTracks().forEach((track) => track.stop())

@@ -1,9 +1,8 @@
 import { useEffect } from 'react'
 import { useParams } from 'react-router'
 
-import { usePeers } from '../hooks/usePeers'
 import { useAppContext } from '../context/Context'
-import { useCamera } from '../hooks/useCamera'
+import { useCamera, usePeers } from '../hooks'
 
 export const Room = () => {
   const { id } = useParams()
