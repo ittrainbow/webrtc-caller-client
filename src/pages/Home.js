@@ -15,23 +15,23 @@ export const Home = () => {
     })
   }, [])
 
-  const handleJoinRoom = (roomID) => {
-    navigate(`/room/${roomID}`)
+  const handleJoinRoom = (room) => {
+    navigate(`/room/${room}`)
   }
 
   const handleCreateRoom = () => {
-    const newRoomID = v4()
-    navigate(`/room/${newRoomID}`)
+    const newRoom = v4()
+    navigate(`/room/${newRoom}`)
   }
 
   return (
     <div ref={containerRef}>
       <h3>Rooms list</h3>
       <div>
-        {rooms.map((roomID) => (
-          <div key={roomID} className="room-in-list">
-            {roomID}
-            <button onClick={() => handleJoinRoom(roomID)}>JOIN ROOM</button>
+        {rooms.map((room) => (
+          <div key={room} className="room-in-list">
+            {room}
+            <button onClick={() => handleJoinRoom(room)}>JOIN ROOM</button>
           </div>
         ))}
       </div>

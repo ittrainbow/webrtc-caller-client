@@ -6,7 +6,7 @@ export const useAppContext = () => useContext(Context)
 
 export const ContextProvider = ({ children }) => {
   const location = useLocation()
-  const [roomID, setRoomID] = useState(null)
+  const [room, setRoom] = useState(null)
 
   const peerConnections = useRef({})
   const localMediaStream = useRef(null)
@@ -17,12 +17,12 @@ export const ContextProvider = ({ children }) => {
   useEffect(() => {
     const { pathname } = location
     const id = pathname.split('/').slice(-1)[0]
-    const roomID = !!id.length ? id : null
-    setRoomID(roomID)
+    const room = !!id.length ? id : null
+    setRoom(room)
   }, [location])
 
   return (
-    <Context.Provider value={{ roomID, peerConnections, localMediaStream, peerMediaElements }}>
+    <Context.Provider value={{ room, peerConnections, localMediaStream, peerMediaElements }}>
       {children}
     </Context.Provider>
   )
