@@ -1,11 +1,10 @@
-import { useEffect, useCallback, useRef, useState } from 'react'
+import { useEffect } from 'react'
 import freeice from 'freeice'
 import { socket } from '../socket'
 import { useAppContext } from '../context/Context'
 import { videoParams } from '../helpers/mediaParams'
 
 export const usePeers = (room) => {
-  // const callbackRef = useRef(null)
   const {
     peers,
     userMediaElement,
@@ -16,33 +15,6 @@ export const usePeers = (room) => {
     updateClients,
     addClient
   } = useAppContext()
-
-  // const [clients, setClients] = useState([])
-
-  // const updateClients = useCallback((newClients, callback) => {
-  //   callbackRef.current = callback
-  //   setClients(newClients)
-  // }, [])
-
-  // useEffect(() => {
-  //   if (callbackRef.current) {
-  //     callbackRef.current(clients)
-  //     callbackRef.current = null
-  //   }
-  // }, [clients])
-
-  // const addClient = useCallback(
-  //   (newClient, callback) => {
-  //     updateClients((clients) => {
-  //       if (!clients.includes(newClient)) {
-  //         return [...clients, newClient]
-  //       }
-
-  //       return clients
-  //     }, callback)
-  //   },
-  //   [updateClients]
-  // )
 
   useEffect(() => {
     const handleAddPeer = async ({ peer, shouldCreateOffer }) => {
@@ -111,14 +83,18 @@ export const usePeers = (room) => {
 
   useEffect(() => {
     const handleRemovePeer = ({ peer }) => {
+      console.log(121, peer)
       removePeer(peer)
+      console.log(122)
       updateClients((clients) => {
-        return clients.filter((client) => client !== peer)
+        const newClients = clients.filter((client) => client !== peer)
+        console.log(123, newClients)
+        return newClients
       })
     }
 
     socket.on('REMOVE_PEER', handleRemovePeer)
-    return () => socket.off('REMOVE_PEER')
+    // return () => socket.off('REMOVE_PEER')
     // eslint-disable-next-line
   }, [clients])
 
@@ -126,10 +102,10 @@ export const usePeers = (room) => {
     const startCapture = async () => {
       userMediaElement.current = await navigator.mediaDevices.getUserMedia(videoParams)
       const addLocal = () => {
-        peerMediaElements.current['localStream'].volume = 0
-        peerMediaElements.current['localStream'].srcObject = userMediaElement.current
+        peerMediaElements.current[socket.id].volume = 0
+        peerMediaElements.current[socket.id].srcObject = userMediaElement.current
       }
-      addClient('localStream', addLocal)
+      addClient(socket.id, addLocal)
 
       socket.emit('JOIN_ROOM', { room })
     }
