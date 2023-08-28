@@ -2,14 +2,12 @@ import { useEffect } from 'react'
 import freeice from 'freeice'
 import { socket } from '../socket'
 import { useAppContext } from '../context/Context'
-import { videoParams } from '../helpers/mediaParams'
 
 export const usePeers = (room) => {
   const {
     peers,
     userMediaElement,
     peerMediaElements,
-    stopUserMediaElementTracks,
     removePeer,
     clients,
     updateClients,
@@ -83,42 +81,16 @@ export const usePeers = (room) => {
 
   useEffect(() => {
     const handleRemovePeer = ({ peer }) => {
-      console.log(121, peer)
       removePeer(peer)
-      console.log(122)
       updateClients((clients) => {
         const newClients = clients.filter((client) => client !== peer)
-        console.log(123, newClients)
         return newClients
       })
     }
 
     socket.on('REMOVE_PEER', handleRemovePeer)
-    // return () => socket.off('REMOVE_PEER')
     // eslint-disable-next-line
   }, [clients])
-
-  useEffect(() => {
-    const startCapture = async () => {
-      userMediaElement.current = await navigator.mediaDevices.getUserMedia(videoParams)
-      const addLocal = () => {
-        peerMediaElements.current[socket.id].volume = 0
-        peerMediaElements.current[socket.id].srcObject = userMediaElement.current
-      }
-      addClient(socket.id, addLocal)
-
-      socket.emit('JOIN_ROOM', { room })
-    }
-
-    const stopCapture = () => {
-      stopUserMediaElementTracks()
-      socket.emit('LEAVE_ROOM')
-    }
-
-    startCapture()
-    return () => stopCapture()
-    // eslint-disable-next-line
-  }, [room])
 
   return clients
 }

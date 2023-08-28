@@ -1,12 +1,22 @@
+import { useEffect } from 'react'
 import { useParams } from 'react-router'
 
 import { usePeers } from '../hooks/usePeers'
 import { useAppContext } from '../context/Context'
+import { useCamera } from '../hooks/useCamera'
 
 export const Room = () => {
   const { id } = useParams()
-  const peers = usePeers(id)
+  const { cameraOn, cameraOff } = useCamera(id)
   const { mediaRef, clients } = useAppContext()
+
+  usePeers(id)
+
+  useEffect(() => {
+    cameraOn()
+    return () => cameraOff()
+    // eslint-disable-next-line
+  }, [id])
 
   return (
     <div className="room-container">
