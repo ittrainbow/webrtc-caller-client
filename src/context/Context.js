@@ -1,5 +1,4 @@
-import { useContext, createContext, useEffect, useState, useRef, useCallback } from 'react'
-import { useLocation } from 'react-router'
+import { useContext, createContext, useRef, useCallback } from 'react'
 import useStateWithCallback from '../hooks/useStateWithCallback'
 
 const Context = createContext()
@@ -22,11 +21,10 @@ export const ContextProvider = ({ children }) => {
     delete peerMediaElements.current[peer]
   }
 
-  const mediaRef = useCallback((id, node) => {
-    peerMediaElements.current[id] = node
-  }, [])
+  const mediaRef = (id, node) => (peerMediaElements.current[id] = node)
 
   const [clients, updateClients] = useStateWithCallback([])
+  
   const addClient = useCallback(
     (newClient, callback) => {
       updateClients((clients) => {
