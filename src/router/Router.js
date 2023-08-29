@@ -1,18 +1,15 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
-import { ContextProvider } from '../context/Context'
-import { Room, Home, NotFound } from '../pages'
+import { Room, NotFound, Rooms } from '../pages'
 
 export const Router = () => {
   return (
     <BrowserRouter>
-      <ContextProvider>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/room/:id" element={<Room />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </ContextProvider>
+      <Routes>
+        <Route path="/" element={<Rooms />} />
+        <Route path="/room/:id" element={<Room />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
     </BrowserRouter>
   )
 }

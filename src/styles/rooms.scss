@@ -1,0 +1,12 @@
+.rooms-top,
+.rooms-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+}
+
+.rooms-top {
+  flex-grow: 1;
+}
