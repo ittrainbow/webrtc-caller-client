@@ -43,19 +43,20 @@ export const usePeers = (room) => {
   }, [])
 
   useEffect(() => {
-    const handleRemotePeerMedia = async ({ peer, sessionDescription }) => {
+    const handleRemotePeer = async ({ peer, sessionDescription }) => {
       const { type } = sessionDescription
       await peers.current[peer].setRemoteDescription(new RTCSessionDescription(sessionDescription))
 
       if (type === 'offer') {
         const answer = await peers.current[peer].createAnswer()
+        answer.sdp = answer.sdp.replace('useinbandfec=1', 'useinbandfec=1; stereo=1; maxaveragebitrate=128000')
         await peers.current[peer].setLocalDescription(answer)
         const sessionDescription = answer
         socket.emit('transmit_sdp', { peer, sessionDescription })
       }
     }
 
-    socket.on('emit_sdp', handleRemotePeerMedia)
+    socket.on('emit_sdp', handleRemotePeer)
     return () => socket.off('emit_sdp')
     // eslint-disable-next-line
   }, [room])
@@ -64,7 +65,7 @@ export const usePeers = (room) => {
     const handleIceCandidate = ({ peer, iceCandidate }) => {
       peers.current[peer].addIceCandidate(new RTCIceCandidate(iceCandidate))
     }
-    
+
     socket.on('emit_ice', handleIceCandidate)
   }, [peers])
 

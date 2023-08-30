@@ -6,7 +6,16 @@ export const useCamera = (room) => {
 
   const cameraOn = async () => {
     userMediaElement.current = await navigator.mediaDevices.getUserMedia({
-      audio: true,
+      audio: {
+        autoGainControl: false,
+        channelCount: 2,
+        echoCancellation: false,
+        latency: 0,
+        noiseSuppression: false,
+        sampleRate: 44100,
+        sampleSize: 16,
+        volume: 1.0
+      },
       video: {
         width: 320,
         height: 240

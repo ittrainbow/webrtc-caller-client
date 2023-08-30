@@ -1,0 +1,18 @@
+.controls-container {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.controls-element {
+  display: flex;
+  width: 40px;
+  height: 40px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 28px;
+  background: #aaa;
+  transition: 0.15s ease-in-out;
+}

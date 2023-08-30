@@ -5,6 +5,8 @@ export const useAppContext = () => useContext(Context)
 
 export const ContextProvider = ({ children }) => {
   const [users, setUsers] = useState([])
+  const [blanked, setBlanked] = useState(false)
+  const [muted, setMuted] = useState(false)
   const peerMediaElements = useRef({})
   const userMediaElement = useRef({})
   const callbackRef = useRef(null)
@@ -20,7 +22,11 @@ export const ContextProvider = ({ children }) => {
     delete peerMediaElements.current[peer]
   }
 
-  const mediaRef = (id, node) => (peerMediaElements.current[id] = node)
+  // userMediaElement.current?.getTracks().forEach(track => console.log(track))
+
+  const mediaRef = ({ peer, node }) => {
+    peerMediaElements.current[peer] = node
+  }
 
   const updateUsers = useCallback((newUsers, callback) => {
     callbackRef.current = callback
@@ -40,6 +46,18 @@ export const ContextProvider = ({ children }) => {
     }, callback)
   }
 
+  const handleMicrophone = () => {
+    const audio = userMediaElement.current?.getTracks().find((track) => track.kind === 'audio')
+    setMuted(audio.enabled)
+    audio.enabled = !audio.enabled
+  }
+
+  const handleCamera = () => {
+    const video = userMediaElement.current?.getTracks().find((track) => track.kind === 'video')
+    setBlanked(video.enabled)
+    video.enabled = !video.enabled
+  }
+
   return (
     <Context.Provider
       value={{
@@ -52,7 +70,11 @@ export const ContextProvider = ({ children }) => {
         users,
         setUsers,
         updateUsers,
-        addUser
+        addUser,
+        blanked,
+        handleCamera,
+        muted,
+        handleMicrophone
       }}
     >
       {children}
