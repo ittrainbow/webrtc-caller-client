@@ -7,4 +7,4 @@ const options = {
   transports: ['websocket']
 }
 
-export const socket = io.connect('http://localhost:5001', options)
+export const socket = io.connect('https://ittr-webrtc-caller.onrender.com', options)

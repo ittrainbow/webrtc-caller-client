@@ -1,4 +1,5 @@
 import { useContext, createContext, useRef, useState, useCallback, useEffect } from 'react'
+import { isMobile } from 'react-device-detect'
 
 export const Context = createContext()
 export const useAppContext = () => useContext(Context)
@@ -7,6 +8,8 @@ export const ContextProvider = ({ children }) => {
   const [users, setUsers] = useState([])
   const [blanked, setBlanked] = useState(false)
   const [muted, setMuted] = useState(false)
+  const [width, setWidth] = useState(320)
+  const [height, setHeight] = useState(240)
   const peerMediaElements = useRef({})
   const userMediaElement = useRef({})
   const callbackRef = useRef(null)
@@ -21,8 +24,6 @@ export const ContextProvider = ({ children }) => {
     delete peers.current[peer]
     delete peerMediaElements.current[peer]
   }
-
-  // userMediaElement.current?.getTracks().forEach(track => console.log(track))
 
   const mediaRef = ({ peer, node }) => {
     peerMediaElements.current[peer] = node
@@ -61,6 +62,7 @@ export const ContextProvider = ({ children }) => {
   return (
     <Context.Provider
       value={{
+        isMobile,
         peers,
         userMediaElement,
         stopUserMediaElementTracks,
@@ -71,6 +73,10 @@ export const ContextProvider = ({ children }) => {
         setUsers,
         updateUsers,
         addUser,
+        width,
+        setWidth,
+        height,
+        setHeight,
         blanked,
         handleCamera,
         muted,

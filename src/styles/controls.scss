@@ -1,18 +1,69 @@
-.controls-container {
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
+.controls-container,
+.controls-container-hidden {
+  position: fixed;
+  top: 10px;
+  transition: 0.24s;
+}
+
+.controls-container-hidden {
+  opacity: 0;
+}
+
+.controls-button {
+  position: absolute;
+  top: 13px;
+  right: 20px;
+  z-index: 100;
+  font-size: 26px;
+  color: #333;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .controls-element {
   display: flex;
-  width: 40px;
-  height: 40px;
+  flex-direction: row;
+  width: 38px;
+  height: 38px;
   justify-content: center;
   align-items: center;
   border-radius: 50%;
   cursor: pointer;
   font-size: 28px;
-  background: #aaa;
   transition: 0.15s ease-in-out;
+}
+
+.controls-elements {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  transition: 0.15 ease-in-out;
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0.2;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.2;
+  }
+}
+
+.animate-fade-in {
+  opacity: 0.2;
+  animation: fade-in 0.15s ease-in-out forwards;
+}
+
+.animate-fade-out {
+  opacity: 1;
+  animation: fade-out 0.15s ease-in-out forwards;
 }

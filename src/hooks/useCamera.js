@@ -12,7 +12,6 @@ export const useCamera = (room) => {
         echoCancellation: false,
         latency: 0,
         noiseSuppression: false,
-        sampleRate: 44100,
         sampleSize: 16,
         volume: 1.0
       },
