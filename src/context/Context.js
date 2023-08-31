@@ -8,8 +8,6 @@ export const ContextProvider = ({ children }) => {
   const [users, setUsers] = useState([])
   const [blanked, setBlanked] = useState(false)
   const [muted, setMuted] = useState(false)
-  const [width, setWidth] = useState(320)
-  const [height, setHeight] = useState(240)
   const peerMediaElements = useRef({})
   const userMediaElement = useRef({})
   const callbackRef = useRef(null)
@@ -73,10 +71,6 @@ export const ContextProvider = ({ children }) => {
         setUsers,
         updateUsers,
         addUser,
-        width,
-        setWidth,
-        height,
-        setHeight,
         blanked,
         handleCamera,
         muted,

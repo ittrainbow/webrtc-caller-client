@@ -1,15 +1,16 @@
 import { useEffect } from 'react'
 import { useParams } from 'react-router'
 
+import { useCamera, usePeers, useGrid } from '../hooks'
 import { useAppContext } from '../context/Context'
-import { useCamera, useDimensions, usePeers } from '../hooks'
-import { socket } from '../socket'
 import { Controls } from '../UI/Controls'
+import { socket } from '../socket'
 
 export const Room = () => {
   const { id } = useParams()
   const { cameraOn, cameraOff } = useCamera(id)
-  const { mediaRef, users, width, height } = useAppContext()
+  const { mediaRef, users } = useAppContext()
+  const { style, width, height } = useGrid()
 
   usePeers(id)
 
@@ -19,11 +20,9 @@ export const Room = () => {
     // eslint-disable-next-line
   }, [])
 
-  useDimensions()
-
   return (
     <div className="room-container">
-      <div className="room-videos">
+      <div className="room-videos" style={style}>
         {users.map((peer, index) => {
           const ref = (node) => mediaRef({ peer, node })
 
