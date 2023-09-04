@@ -7,10 +7,10 @@ export const useGrid = () => {
   const [rows, setRows] = useState(1)
   const [width, setWidth] = useState(320)
   const [height, setHeight] = useState(240)
-  const { users, isMobile } = useAppContext()
+  const { isMobile, users } = useAppContext()
 
   useEffect(() => {
-    switch (users.length) {
+    switch (users?.length) {
       case 2:
         setCols(2)
         setRows(1)

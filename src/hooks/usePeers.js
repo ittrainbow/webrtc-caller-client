@@ -22,6 +22,7 @@ export const usePeers = (room) => {
             peerMediaElements.current[peer].srcObject = remoteStream
           }
         }
+
         addUser(peer, addPeer)
       }
 

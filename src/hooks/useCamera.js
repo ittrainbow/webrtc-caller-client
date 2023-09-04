@@ -2,7 +2,7 @@ import { useAppContext } from '../context/Context'
 import { socket } from '../socket'
 
 export const useCamera = (room) => {
-  const { userMediaElement, peerMediaElements, addUser, stopUserMediaElementTracks } = useAppContext()
+  const { userMediaElement, peerMediaElements, stopUserMediaElementTracks, addUser } = useAppContext()
 
   const cameraOn = async () => {
     userMediaElement.current = await navigator.mediaDevices.getUserMedia({
