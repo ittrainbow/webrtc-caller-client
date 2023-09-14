@@ -9,8 +9,7 @@ export const useGrid = () => {
   const [rows, setRows] = useState(1)
   const [width, setWidth] = useState(320)
   const [height, setHeight] = useState(240)
-  const { users } = useAppContext()
-  const { mobile } = useSelector(selectApp)
+  const { mobile, users } = useSelector(selectApp)
 
   useEffect(() => {
     switch (users?.length) {

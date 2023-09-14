@@ -1,8 +1,14 @@
+import { useDispatch, useSelector } from 'react-redux'
 import { useAppContext } from '../context/Context'
 import { socket } from '../socket'
+import { selectApp } from '../toolkit/selectors'
+import { appActions } from '../toolkit/appSlice'
 
 export const useCamera = (room) => {
-  const { userMediaElement, peerMediaElements, updateUsers, users } = useAppContext()
+  const { userMediaElement, peerMediaElements, updateUsers } = useAppContext()
+  const dispatch = useDispatch()
+
+  const { users } = useSelector(selectApp)
 
   const cameraOn = async () => {
     userMediaElement.current = await navigator.mediaDevices.getUserMedia({
@@ -35,6 +41,7 @@ export const useCamera = (room) => {
 
   const cameraOff = () => {
     userMediaElement.current?.getTracks().forEach((track) => track.stop())
+    dispatch(appActions.resetUsers())
     socket.emit('leave_room')
   }
 

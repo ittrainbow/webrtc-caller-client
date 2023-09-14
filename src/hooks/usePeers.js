@@ -3,9 +3,12 @@ import { useEffect } from 'react'
 import { iceServers } from '../helpers/iceServers'
 import { useAppContext } from '../context/Context'
 import { socket } from '../socket'
+import { useSelector } from 'react-redux'
+import { selectApp } from '../toolkit/selectors'
 
 export const usePeers = (room) => {
-  const { peers, userMediaElement, peerMediaElements, removePeer, users, updateUsers } = useAppContext()
+  const { peers, userMediaElement, peerMediaElements, removePeer, updateUsers } = useAppContext()
+  const { users } = useSelector(selectApp)
 
   useEffect(() => {
     const handleAddPeer = async ({ peer, shouldCreateOffer }) => {
@@ -68,18 +71,17 @@ export const usePeers = (room) => {
     }
 
     socket.on('emit_ice', handleIceCandidate)
+    return () => socket.off('emit_ice')
   }, [peers])
 
   useEffect(() => {
     const handleRemovePeer = ({ peer }) => {
       removePeer(peer)
-      updateUsers((users) => {
-        const newUsers = users.filter((user) => user !== peer)
-        return newUsers
-      })
+      updateUsers(users.filter((user) => user !== peer))
     }
 
     socket.on('remove_peer', handleRemovePeer)
+    return () => socket.off('remove_peer')
     // eslint-disable-next-line
   }, [users])
 }

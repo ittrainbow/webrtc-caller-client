@@ -15,6 +15,10 @@ export const appSlice = createSlice({
       state.users = action.payload
     },
 
+    resetUsers(state) {
+      state.users = []
+    },
+
     setMobile(state, action) {
       state.mobile = action.payload
     },

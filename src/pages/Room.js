@@ -5,12 +5,16 @@ import { useCamera, usePeers, useGrid } from '../hooks'
 import { useAppContext } from '../context/Context'
 import { Controls } from '../UI/Controls'
 import { socket } from '../socket'
+import { useSelector } from 'react-redux'
+import { selectApp } from '../toolkit/selectors'
 
 export const Room = () => {
   const { id } = useParams()
   const { cameraOn, cameraOff } = useCamera(id)
-  const { mediaRef, users } = useAppContext()
+  const { mediaRef } = useAppContext()
   const { style, width, height } = useGrid()
+
+  const { users } = useSelector(selectApp)
 
   usePeers(id)
 

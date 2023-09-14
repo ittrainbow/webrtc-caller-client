@@ -17,7 +17,7 @@ import { selectApp } from '../toolkit/selectors'
 export const Controls = () => {
   const navigate = useNavigate()
   const { pathname } = useLocation()
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(true)
   const url = 'ittr-multiuser-webrtc-call.web.app' + pathname
   const { handleCamera, handleMicrophone } = useAppContext()
   const { blanked, muted } = useSelector(selectApp)
