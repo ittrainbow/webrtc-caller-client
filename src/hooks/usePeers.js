@@ -5,7 +5,7 @@ import { useAppContext } from '../context/Context'
 import { socket } from '../socket'
 
 export const usePeers = (room) => {
-  const { peers, userMediaElement, peerMediaElements, removePeer, users, updateUsers, addUser } = useAppContext()
+  const { peers, userMediaElement, peerMediaElements, removePeer, users, updateUsers } = useAppContext()
 
   useEffect(() => {
     const handleAddPeer = async ({ peer, shouldCreateOffer }) => {
@@ -23,7 +23,7 @@ export const usePeers = (room) => {
           }
         }
 
-        addUser(peer, addPeer)
+        updateUsers(users.includes(peer) ? users : [...users, peer], addPeer)
       }
 
       userMediaElement.current?.getTracks().forEach((track) => {
@@ -41,7 +41,7 @@ export const usePeers = (room) => {
     socket.on('add_peer', handleAddPeer)
     return () => socket.off('add_peer')
     // eslint-disable-next-line
-  }, [])
+  }, [users])
 
   useEffect(() => {
     const handleRemotePeer = async ({ peer, sessionDescription }) => {

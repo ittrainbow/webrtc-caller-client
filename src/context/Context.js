@@ -26,6 +26,7 @@ export const ContextProvider = ({ children }) => {
   const updateUsers = useCallback((newUsers, callback) => {
     callbackRef.current = callback
     setUsers(newUsers)
+    dispatch(appActions.setUsers(newUsers))
   }, [])
 
   useEffect(() => {
@@ -34,12 +35,6 @@ export const ContextProvider = ({ children }) => {
       callbackRef.current = null
     }
   }, [users])
-
-  const addUser = (newUser, callback) => {
-    updateUsers((users) => {
-      return users.includes(newUser) ? users : [...users, newUser]
-    }, callback)
-  }
 
   const handleMicrophone = () => {
     const audio = userMediaElement.current?.getTracks().find((track) => track.kind === 'audio')
@@ -62,9 +57,7 @@ export const ContextProvider = ({ children }) => {
         removePeer,
         mediaRef,
         users,
-        setUsers,
         updateUsers,
-        addUser,
         handleCamera,
         handleMicrophone
       }}
