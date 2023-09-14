@@ -1,21 +1,17 @@
 import { useContext, createContext, useRef, useState, useCallback, useEffect } from 'react'
-import { isMobile } from 'react-device-detect'
+import { appActions } from '../toolkit/appSlice'
+import { useDispatch } from 'react-redux'
 
 export const Context = createContext()
 export const useAppContext = () => useContext(Context)
 
 export const ContextProvider = ({ children }) => {
+  const dispatch = useDispatch()
   const [users, setUsers] = useState([])
-  const [blanked, setBlanked] = useState(false)
-  const [muted, setMuted] = useState(false)
   const peerMediaElements = useRef({})
   const userMediaElement = useRef({})
   const callbackRef = useRef(null)
   const peers = useRef({})
-
-  const stopUserMediaElementTracks = () => {
-    userMediaElement.current?.getTracks().forEach((track) => track.stop())
-  }
 
   const removePeer = (peer) => {
     peers.current[peer] && peers.current[peer].close()
@@ -47,23 +43,21 @@ export const ContextProvider = ({ children }) => {
 
   const handleMicrophone = () => {
     const audio = userMediaElement.current?.getTracks().find((track) => track.kind === 'audio')
-    setMuted(audio.enabled)
+    dispatchEvent(appActions.setMuted(audio.enabled))
     audio.enabled = !audio.enabled
   }
 
   const handleCamera = () => {
     const video = userMediaElement.current?.getTracks().find((track) => track.kind === 'video')
-    setBlanked(video.enabled)
+    dispatchEvent(appActions.setBlanked(video.enabled))
     video.enabled = !video.enabled
   }
 
   return (
     <Context.Provider
       value={{
-        isMobile,
         peers,
         userMediaElement,
-        stopUserMediaElementTracks,
         peerMediaElements,
         removePeer,
         mediaRef,
@@ -71,9 +65,7 @@ export const ContextProvider = ({ children }) => {
         setUsers,
         updateUsers,
         addUser,
-        blanked,
         handleCamera,
-        muted,
         handleMicrophone
       }}
     >

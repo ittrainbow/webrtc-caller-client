@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react'
 
 import { useAppContext } from '../context/Context'
+import { useSelector } from 'react-redux'
+import { selectApp } from '../toolkit/selectors'
 
 export const useGrid = () => {
   const [cols, setCols] = useState(1)
   const [rows, setRows] = useState(1)
   const [width, setWidth] = useState(320)
   const [height, setHeight] = useState(240)
-  const { isMobile, users } = useAppContext()
+  const { users } = useAppContext()
+  const { mobile } = useSelector(selectApp)
 
   useEffect(() => {
     switch (users?.length) {
@@ -43,7 +46,7 @@ export const useGrid = () => {
   useEffect(() => {
     const number = users?.length
     const width = window.visualViewport.width
-    const height = window.visualViewport.height - (isMobile ? 0 : 50)
+    const height = window.visualViewport.height - (mobile ? 0 : 50)
 
     switch (number) {
       case 1:

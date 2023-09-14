@@ -2,7 +2,7 @@ import { useAppContext } from '../context/Context'
 import { socket } from '../socket'
 
 export const useCamera = (room) => {
-  const { userMediaElement, peerMediaElements, stopUserMediaElementTracks, addUser } = useAppContext()
+  const { userMediaElement, peerMediaElements, addUser } = useAppContext()
 
   const cameraOn = async () => {
     userMediaElement.current = await navigator.mediaDevices.getUserMedia({
@@ -32,7 +32,7 @@ export const useCamera = (room) => {
   }
 
   const cameraOff = () => {
-    stopUserMediaElementTracks()
+    userMediaElement.current?.getTracks().forEach((track) => track.stop())
     socket.emit('leave_room')
   }
 

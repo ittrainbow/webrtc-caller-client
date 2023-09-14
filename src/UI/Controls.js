@@ -11,13 +11,16 @@ import { Button } from '@mui/material'
 
 import { useAppContext } from '../context/Context'
 import { useLocation, useNavigate } from 'react-router'
+import { useSelector } from 'react-redux'
+import { selectApp } from '../toolkit/selectors'
 
 export const Controls = () => {
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const [open, setOpen] = useState(false)
   const url = 'ittr-multiuser-webrtc-call.web.app' + pathname
-  const { blanked, handleCamera, muted, handleMicrophone } = useAppContext()
+  const { handleCamera, handleMicrophone } = useAppContext()
+  const { blanked, muted } = useSelector(selectApp)
 
   const navigateHandler = () => {
     navigate('/')
