@@ -4,7 +4,7 @@ import { iceServers } from '../helpers/iceServers'
 import { useAppContext } from '../context/Context'
 import { socket } from '../socket'
 import { useSelector } from 'react-redux'
-import { selectApp } from '../toolkit/selectors'
+import { selectApp } from '../redux/selectors'
 
 export const usePeers = (room) => {
   const { peers, userMediaElement, peerMediaElements, removePeer, updateUsers } = useAppContext()
@@ -42,7 +42,7 @@ export const usePeers = (room) => {
     }
 
     socket.on('add_peer', handleAddPeer)
-    return () => socket.off('add_peer')
+    return () => socket.off('add_peer', handleAddPeer)
     // eslint-disable-next-line
   }, [users])
 
@@ -61,7 +61,7 @@ export const usePeers = (room) => {
     }
 
     socket.on('emit_sdp', handleRemotePeer)
-    return () => socket.off('emit_sdp')
+    return () => socket.off('emit_sdp', handleRemotePeer)
     // eslint-disable-next-line
   }, [room])
 
@@ -71,7 +71,7 @@ export const usePeers = (room) => {
     }
 
     socket.on('emit_ice', handleIceCandidate)
-    return () => socket.off('emit_ice')
+    return () => socket.off('emit_ice', handleIceCandidate)
   }, [peers])
 
   useEffect(() => {
@@ -81,7 +81,7 @@ export const usePeers = (room) => {
     }
 
     socket.on('remove_peer', handleRemovePeer)
-    return () => socket.off('remove_peer')
+    return () => socket.off('remove_peer', handleRemovePeer)
     // eslint-disable-next-line
   }, [users])
 }

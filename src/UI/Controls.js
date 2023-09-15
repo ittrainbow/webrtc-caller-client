@@ -12,7 +12,7 @@ import { Button } from '@mui/material'
 import { useAppContext } from '../context/Context'
 import { useLocation, useNavigate } from 'react-router'
 import { useSelector } from 'react-redux'
-import { selectApp } from '../toolkit/selectors'
+import { selectApp } from '../redux/selectors'
 
 export const Controls = () => {
   const navigate = useNavigate()

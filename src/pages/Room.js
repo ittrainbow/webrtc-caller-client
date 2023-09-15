@@ -6,7 +6,7 @@ import { useAppContext } from '../context/Context'
 import { Controls } from '../UI/Controls'
 import { socket } from '../socket'
 import { useSelector } from 'react-redux'
-import { selectApp } from '../toolkit/selectors'
+import { selectApp } from '../redux/selectors'
 
 export const Room = () => {
   const { id } = useParams()

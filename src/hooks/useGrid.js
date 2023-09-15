@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
 
-import { useAppContext } from '../context/Context'
 import { useSelector } from 'react-redux'
-import { selectApp } from '../toolkit/selectors'
+import { selectApp } from '../redux/selectors'
 
 export const useGrid = () => {
   const [cols, setCols] = useState(1)

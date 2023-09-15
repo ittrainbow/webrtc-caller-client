@@ -1,7 +1,7 @@
-import { useContext, createContext, useRef, useState, useCallback, useEffect } from 'react'
-import { appActions } from '../toolkit/appSlice'
+import { useContext, createContext, useRef, useCallback, useEffect } from 'react'
+import { appActions } from '../redux/appSlice'
 import { useDispatch, useSelector } from 'react-redux'
-import { selectApp } from '../toolkit/selectors'
+import { selectApp } from '../redux/selectors'
 
 export const Context = createContext()
 export const useAppContext = () => useContext(Context)
@@ -30,6 +30,7 @@ export const ContextProvider = ({ children }) => {
       callbackRef.current = callback
     }
     dispatch(appActions.setUsers(newUsers))
+    // eslint-disable-next-line
   }, [])
 
   useEffect(() => {

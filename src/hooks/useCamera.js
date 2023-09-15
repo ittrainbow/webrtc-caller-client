@@ -1,8 +1,8 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { useAppContext } from '../context/Context'
 import { socket } from '../socket'
-import { selectApp } from '../toolkit/selectors'
-import { appActions } from '../toolkit/appSlice'
+import { selectApp } from '../redux/selectors'
+import { appActions } from '../redux/appSlice'
 
 export const useCamera = (room) => {
   const { userMediaElement, peerMediaElements, updateUsers } = useAppContext()
