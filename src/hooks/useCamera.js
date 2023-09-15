@@ -1,14 +1,11 @@
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { useAppContext } from '../context/Context'
 import { socket } from '../socket'
-import { selectApp } from '../redux/selectors'
-import { appActions } from '../redux/appSlice'
+import { ADD_USER, LEAVE_ROOM } from '../types'
 
 export const useCamera = (room) => {
-  const { userMediaElement, peerMediaElements, updateUsers } = useAppContext()
+  const { userMediaElement, peerMediaElements, callbackRef } = useAppContext()
   const dispatch = useDispatch()
-
-  const { users } = useSelector(selectApp)
 
   const cameraOn = async () => {
     userMediaElement.current = await navigator.mediaDevices.getUserMedia({
@@ -34,15 +31,15 @@ export const useCamera = (room) => {
       peerMediaElements.current[id].srcObject = userMediaElement.current
     }
 
-    updateUsers(users.includes(id) ? users : [...users, id], addLocal)
+    callbackRef.current = addLocal
+    dispatch({ type: ADD_USER, payload: socket.id })
 
     socket.emit('join_room', { room })
   }
 
   const cameraOff = () => {
     userMediaElement.current?.getTracks().forEach((track) => track.stop())
-    dispatch(appActions.resetUsers())
-    socket.emit('leave_room')
+    socket.emit(LEAVE_ROOM)
   }
 
   return { cameraOn, cameraOff }

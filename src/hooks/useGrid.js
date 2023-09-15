@@ -1,14 +1,12 @@
 import { useEffect, useState } from 'react'
-
 import { useSelector } from 'react-redux'
-import { selectApp } from '../redux/selectors'
 
 export const useGrid = () => {
   const [cols, setCols] = useState(1)
   const [rows, setRows] = useState(1)
   const [width, setWidth] = useState(320)
   const [height, setHeight] = useState(240)
-  const { mobile, users } = useSelector(selectApp)
+  const { mobile, users } = useSelector((store) => store.app)
 
   useEffect(() => {
     switch (users?.length) {

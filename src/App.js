@@ -3,13 +3,13 @@ import { isMobile } from 'react-device-detect'
 import { useDispatch } from 'react-redux'
 
 import { Router } from './router/Router'
-import { appActions } from './redux/appSlice'
+import { SET_MOBILE } from './types'
 
 export const App = () => {
   const dispatch = useDispatch()
-  
+
   useEffect(() => {
-    dispatch(appActions.setMobile(isMobile))
+    dispatch({ type: SET_MOBILE, payload: isMobile })
     // eslint-disable-next-line
   }, [])
 
