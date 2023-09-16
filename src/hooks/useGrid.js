@@ -1,16 +1,15 @@
 import { useEffect, useState } from 'react'
-
-import { useAppContext } from '../context/Context'
+import { useSelector } from 'react-redux'
 
 export const useGrid = () => {
   const [cols, setCols] = useState(1)
   const [rows, setRows] = useState(1)
   const [width, setWidth] = useState(320)
   const [height, setHeight] = useState(240)
-  const { users, isMobile } = useAppContext()
+  const { mobile, users } = useSelector((store) => store.app)
 
   useEffect(() => {
-    switch (users.length) {
+    switch (users?.length) {
       case 2:
         setCols(2)
         setRows(1)
@@ -43,7 +42,7 @@ export const useGrid = () => {
   useEffect(() => {
     const number = users?.length
     const width = window.visualViewport.width
-    const height = window.visualViewport.height - (isMobile ? 0 : 50)
+    const height = window.visualViewport.height - (mobile ? 0 : 50)
 
     switch (number) {
       case 1:

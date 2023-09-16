@@ -11,13 +11,29 @@ import { Button } from '@mui/material'
 
 import { useAppContext } from '../context/Context'
 import { useLocation, useNavigate } from 'react-router'
+import { useSelector, useDispatch } from 'react-redux'
+import { SET_BLANKED, SET_MUTED } from '../types'
 
 export const Controls = () => {
   const navigate = useNavigate()
+  const dispatch = useDispatch()
   const { pathname } = useLocation()
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(true)
   const url = 'ittr-multiuser-webrtc-call.web.app' + pathname
-  const { blanked, handleCamera, muted, handleMicrophone } = useAppContext()
+  const { userMediaElement } = useAppContext()
+  const { blanked, muted } = useSelector((store) => store.app)
+
+  const handleMicrophone = () => {
+    const audio = userMediaElement.current?.getTracks().find((track) => track.kind === 'audio')
+    dispatch({ type: SET_MUTED, payload: audio.enabled })
+    audio.enabled = !audio.enabled
+  }
+
+  const handleCamera = () => {
+    const video = userMediaElement.current?.getTracks().find((track) => track.kind === 'video')
+    dispatch({ type: SET_BLANKED, payload: video.enabled })
+    video.enabled = !video.enabled
+  }
 
   const navigateHandler = () => {
     navigate('/')

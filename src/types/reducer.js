@@ -1,0 +1,8 @@
+export const SET_USERS = 'SET_USERS'
+export const UPDATE_USERS = 'UPDATE_USERS'
+export const ADD_USER = 'ADD_USER'
+export const REMOVE_USER = 'REMOVE_USER'
+export const RESET_USERS = 'RESET_USERS'
+export const SET_MOBILE = 'SET_MOBILE'
+export const SET_BLANKED = 'SET_BLANKED'
+export const SET_MUTED = 'SET_MUTED'

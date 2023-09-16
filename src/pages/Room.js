@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useParams } from 'react-router'
+import { useSelector } from 'react-redux'
 
 import { useCamera, usePeers, useGrid } from '../hooks'
 import { useAppContext } from '../context/Context'
@@ -9,8 +10,10 @@ import { socket } from '../socket'
 export const Room = () => {
   const { id } = useParams()
   const { cameraOn, cameraOff } = useCamera(id)
-  const { mediaRef, users } = useAppContext()
+  const { peerMediaElements } = useAppContext()
   const { style, width, height } = useGrid()
+
+  const { users } = useSelector((store) => store.app)
 
   usePeers(id)
 
@@ -20,26 +23,31 @@ export const Room = () => {
     // eslint-disable-next-line
   }, [])
 
+  const mediaRef = ({ peer, node }) => {
+    peerMediaElements.current[peer] = node
+  }
+
   return (
     <div className="room-container">
       <div className="room-videos" style={style}>
-        {users.map((peer, index) => {
-          const ref = (node) => mediaRef({ peer, node })
+        {!!users.length &&
+          users.map((peer, index) => {
+            const ref = (node) => mediaRef({ peer, node })
 
-          return (
-            <div key={index} id={peer}>
-              <video
-                className="room-video"
-                width={width}
-                height={height}
-                ref={ref}
-                autoPlay
-                playsInline
-                muted={peer === socket.id}
-              />
-            </div>
-          )
-        })}
+            return (
+              <div key={index} id={peer}>
+                <video
+                  className="room-video"
+                  width={width}
+                  height={height}
+                  ref={ref}
+                  autoPlay
+                  playsInline
+                  muted={peer === socket.id}
+                />
+              </div>
+            )
+          })}
       </div>
       <Controls />
     </div>

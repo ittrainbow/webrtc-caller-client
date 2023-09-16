@@ -1,11 +1,14 @@
 import { useEffect } from 'react'
+import { useSelector } from 'react-redux'
 
 import { iceServers } from '../helpers/iceServers'
 import { useAppContext } from '../context/Context'
+import { ADD_PEER, REMOVE_PEER } from '../types'
 import { socket } from '../socket'
 
 export const usePeers = (room) => {
-  const { peers, userMediaElement, peerMediaElements, removePeer, users, updateUsers, addUser } = useAppContext()
+  const { peers, userMediaElement, peerMediaElements, callbackRef } = useAppContext()
+  const { users } = useSelector((store) => store.app)
 
   useEffect(() => {
     const handleAddPeer = async ({ peer, shouldCreateOffer }) => {
@@ -22,7 +25,8 @@ export const usePeers = (room) => {
             peerMediaElements.current[peer].srcObject = remoteStream
           }
         }
-        addUser(peer, addPeer)
+
+        callbackRef.current = addPeer
       }
 
       userMediaElement.current?.getTracks().forEach((track) => {
@@ -37,10 +41,11 @@ export const usePeers = (room) => {
       }
     }
 
-    socket.on('add_peer', handleAddPeer)
-    return () => socket.off('add_peer')
+    socket.on(ADD_PEER, handleAddPeer)
+
+    return () => socket.off(ADD_PEER, handleAddPeer)
     // eslint-disable-next-line
-  }, [])
+  }, [users])
 
   useEffect(() => {
     const handleRemotePeer = async ({ peer, sessionDescription }) => {
@@ -57,7 +62,8 @@ export const usePeers = (room) => {
     }
 
     socket.on('emit_sdp', handleRemotePeer)
-    return () => socket.off('emit_sdp')
+
+    return () => socket.off('emit_sdp', handleRemotePeer)
     // eslint-disable-next-line
   }, [room])
 
@@ -67,18 +73,20 @@ export const usePeers = (room) => {
     }
 
     socket.on('emit_ice', handleIceCandidate)
+
+    return () => socket.off('emit_ice', handleIceCandidate)
   }, [peers])
 
   useEffect(() => {
     const handleRemovePeer = ({ peer }) => {
-      removePeer(peer)
-      updateUsers((users) => {
-        const newUsers = users.filter((user) => user !== peer)
-        return newUsers
-      })
+      peers.current[peer] && peers.current[peer].close()
+      delete peers.current[peer]
+      delete peerMediaElements.current[peer]
     }
 
-    socket.on('remove_peer', handleRemovePeer)
+    socket.on(REMOVE_PEER, handleRemovePeer)
+
+    return () => socket.off(REMOVE_PEER, handleRemovePeer)
     // eslint-disable-next-line
   }, [users])
 }
