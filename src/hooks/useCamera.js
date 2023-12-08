@@ -3,12 +3,15 @@ import { useAppContext } from '../context/Context'
 import { socket } from '../socket'
 import { ADD_USER, LEAVE_ROOM } from '../types'
 
+import { mediaStore } from '../mobx/userMediaStore'
+const store = mediaStore()
+
 export const useCamera = (room) => {
   const { userMediaElement, peerMediaElements, callbackRef } = useAppContext()
   const dispatch = useDispatch()
 
   const cameraOn = async () => {
-    userMediaElement.current = await navigator.mediaDevices.getUserMedia({
+    const cam = await navigator.mediaDevices.getUserMedia({
       audio: {
         autoGainControl: false,
         channelCount: 2,
@@ -23,6 +26,10 @@ export const useCamera = (room) => {
         height: 240
       }
     })
+
+    console.log(3, cam)
+    userMediaElement.current = cam
+    store.setUserMedia(cam)
 
     const { id } = socket
 

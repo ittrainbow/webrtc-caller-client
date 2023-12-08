@@ -6,11 +6,11 @@ import { socket } from '../socket'
 
 const createChannel = (socket) => {
   return eventChannel((emit) => {
-    const addPeerHandler = ({ peer }) => emit(peer)
+    const removePeerHandler = ({ peer }) => emit(peer)
 
-    socket.on(REMOVE_PEER, addPeerHandler)
+    socket.on(REMOVE_PEER, removePeerHandler)
 
-    return () => socket.off(REMOVE_PEER, addPeerHandler)
+    return () => socket.off(REMOVE_PEER, removePeerHandler)
   })
 }
 

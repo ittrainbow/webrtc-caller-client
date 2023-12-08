@@ -1,24 +1,50 @@
 import { useEffect } from 'react'
 import { useSelector } from 'react-redux'
+import { toJS, autorun } from 'mobx'
 
 import { iceServers } from '../helpers/iceServers'
 import { useAppContext } from '../context/Context'
 import { ADD_PEER, REMOVE_PEER } from '../types'
 import { socket } from '../socket'
 
+import { mediaStore } from '../mobx/userMediaStore'
+const store = mediaStore()
+
+const { peersStore, userMediaStore, peerMediaStore } = store
+
+autorun(() => console.log(5, userMediaStore))
+
+const notEmpty = (obj) => !!Object.keys(obj).length
+
 export const usePeers = (room) => {
   const { peers, userMediaElement, peerMediaElements, callbackRef } = useAppContext()
   const { users } = useSelector((store) => store.app)
 
+  const mobxUserMedia = toJS(store.userMediaStore)
+  const mobxPeers = toJS(store.peerMediaStore)
+  const { newConnection } = store
+
+  // console.log(1, peers)
+  // autorun(() => console.log(2, mobxPeers))
+
   useEffect(() => {
     const handleAddPeer = async ({ peer, shouldCreateOffer }) => {
+      //
       peers.current[peer] = new RTCPeerConnection({ iceServers })
+      // newConnection(peer)
 
+      //
       peers.current[peer].onicecandidate = (event) => {
         const iceCandidate = event.candidate
         iceCandidate && socket.emit('transmit_ice', { peer, iceCandidate })
       }
 
+      peersStore[peer].onicecandidate = (event) => {
+        const iceCandidate = event.candidate
+        iceCandidate && socket.emit('transmit_ice', { peer, iceCandidate })
+      }
+
+      //
       peers.current[peer].ontrack = ({ streams: [remoteStream] }) => {
         const addPeer = () => {
           if (peerMediaElements.current[peer]) {
@@ -29,9 +55,25 @@ export const usePeers = (room) => {
         callbackRef.current = addPeer
       }
 
+      peersStore[peer].ontrack = ({ streams: [remoteStream] }) => {
+        const addPeer = () => {
+          if (peerMediaStore[peer]) {
+            peerMediaStore[peer].srcObject = remoteStream
+          }
+        }
+
+        callbackRef.current = addPeer
+      }
+
+      //
       userMediaElement.current?.getTracks().forEach((track) => {
         peers.current[peer].addTrack(track, userMediaElement.current)
       })
+
+      notEmpty(mobxUserMedia) &&
+        mobxUserMedia.getTracks().forEach((track) => {
+          peers.current[peer].addTrack(track, userMediaElement.current)
+        })
 
       if (shouldCreateOffer) {
         const offer = await peers.current[peer].createOffer()
