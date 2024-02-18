@@ -10,6 +10,11 @@ export const useGrid = () => {
 
   useEffect(() => {
     switch (users?.length) {
+      case 1:
+        setCols(1)
+        setRows(1)
+        break
+
       case 2:
         setCols(2)
         setRows(1)

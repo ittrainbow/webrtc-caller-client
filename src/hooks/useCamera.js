@@ -24,7 +24,7 @@ export const useCamera = (room) => {
       }
     })
 
-    const { id } = socket
+    const id = await socket.id
 
     const addLocal = () => {
       peerMediaElements.current[id].volume = 0
@@ -32,7 +32,7 @@ export const useCamera = (room) => {
     }
 
     callbackRef.current = addLocal
-    dispatch({ type: ADD_USER, payload: socket.id })
+    id && dispatch({ type: ADD_USER, payload: id })
 
     socket.emit('join_room', { room })
   }
