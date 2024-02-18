@@ -12,6 +12,7 @@ export const Room = () => {
   const { cameraOn, cameraOff } = useCamera(id)
   const { peerMediaElements } = useAppContext()
   const { style, width, height } = useGrid()
+  const { connected } = socket
 
   const { users } = useSelector((store) => store.app)
 
@@ -21,7 +22,7 @@ export const Room = () => {
     cameraOn()
     return () => cameraOff()
     // eslint-disable-next-line
-  }, [])
+  }, [connected])
 
   const mediaRef = ({ peer, node }) => {
     peerMediaElements.current[peer] = node

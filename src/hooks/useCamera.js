@@ -39,7 +39,7 @@ export const useCamera = (room) => {
     }
 
     callbackRef.current = addLocal
-    dispatch({ type: ADD_USER, payload: socket.id })
+    id && dispatch({ type: ADD_USER, payload: id })
 
     socket.emit('join_room', { room })
   }

@@ -1,4 +1,4 @@
-import { ADD_USER, REMOVE_USER, RESET_USERS, SET_BLANKED, SET_MOBILE, SET_MUTED } from '../../types'
+import { ADD_USER, LEAVE_ROOM, REMOVE_USER, RESET_USERS, SET_BLANKED, SET_MOBILE, SET_MUTED } from '../../types'
 
 const initialState = {
   users: [],
@@ -45,6 +45,12 @@ export const appReducer = (state = initialState, action) => {
       return {
         ...state,
         muted: payload
+      }
+
+    case LEAVE_ROOM:
+      return {
+        ...state,
+        users: []
       }
 
     default:
