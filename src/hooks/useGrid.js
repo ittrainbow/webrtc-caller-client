@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 
-export const useGrid = () => {
+export const useGrid = (controlsOpen) => {
   const [cols, setCols] = useState(1)
   const [rows, setRows] = useState(1)
   const [width, setWidth] = useState(320)
@@ -16,11 +16,15 @@ export const useGrid = () => {
         break
 
       case 2:
-        setCols(2)
-        setRows(1)
+        setCols(mobile ? 1 : 2)
+        setRows(mobile ? 2 : 1)
         break
 
       case 3:
+        setCols(mobile ? 1 : 2)
+        setRows(mobile ? 3 : 2)
+        break
+
       case 4:
         setCols(2)
         setRows(2)
@@ -42,12 +46,12 @@ export const useGrid = () => {
       default:
         break
     }
-  }, [users])
+  }, [users, mobile])
 
   useEffect(() => {
     const number = users?.length
-    const width = window.visualViewport.width
-    const height = window.visualViewport.height - (mobile ? 0 : 50)
+    const width = Math.floor(window.visualViewport.width)
+    const height = Math.floor(window.visualViewport.height - (mobile ? 250 : 50))
 
     switch (number) {
       case 1:
@@ -79,14 +83,15 @@ export const useGrid = () => {
         break
     }
     // eslint-disable-next-line
-  }, [users])
+  }, [users, mobile])
 
   const style = {
     display: 'grid',
     gridTemplateColumns: `repeat(${cols}, 1fr)`,
     gridTemplateRows: `repeat(${rows}, 1fr)`,
     gridColumnGap: '5px',
-    gridRowGap: '5px'
+    gridRowGap: '5px',
+    paddingTop: mobile && controlsOpen ? '150px' : '0'
   }
 
   return { cols, rows, width, height, style }

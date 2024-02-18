@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams } from 'react-router'
 import { useSelector } from 'react-redux'
 
@@ -9,9 +9,10 @@ import { socket } from '../socket'
 
 export const Room = () => {
   const { id } = useParams()
+  const [controlsOpen, setControlsOpen] = useState(false)
   const { cameraOn, cameraOff } = useCamera(id)
   const { peerMediaElements } = useAppContext()
-  const { style, width, height } = useGrid()
+  const { style, width, height } = useGrid(controlsOpen)
   const { connected } = socket
 
   const { users } = useSelector((store) => store.app)
@@ -36,7 +37,7 @@ export const Room = () => {
             const ref = (node) => mediaRef({ peer, node })
 
             return (
-              <div key={index} id={peer}>
+              <div key={index} id={peer} style={{ height }}>
                 <video
                   className="room-video"
                   width={width}
@@ -50,7 +51,7 @@ export const Room = () => {
             )
           })}
       </div>
-      <Controls />
+      <Controls open={controlsOpen} setOpen={setControlsOpen} />
     </div>
   )
 }

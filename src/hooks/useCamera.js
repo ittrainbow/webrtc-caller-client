@@ -24,7 +24,7 @@ export const useCamera = (room) => {
       }
     })
 
-    const id = await socket.id
+    const { id } = socket
 
     const addLocal = () => {
       peerMediaElements.current[id].volume = 0

@@ -35,9 +35,15 @@
 
 .controls-elements {
   display: flex;
-  flex-direction: row;
   gap: 10px;
   transition: 0.15 ease-in-out;
+}
+
+.controls-buttons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
 }
 
 @keyframes fade-in {

@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import {
   PiVideoCameraDuotone,
   PiVideoCameraSlashDuotone,
@@ -14,14 +13,13 @@ import { useLocation, useNavigate } from 'react-router'
 import { useSelector, useDispatch } from 'react-redux'
 import { SET_BLANKED, SET_MUTED } from '../types'
 
-export const Controls = () => {
+export const Controls = ({ open, setOpen }) => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const { pathname } = useLocation()
-  const [open, setOpen] = useState(true)
   const url = 'ittr-multiuser-webrtc-call.web.app' + pathname
   const { userMediaElement } = useAppContext()
-  const { blanked, muted } = useSelector((store) => store.app)
+  const { blanked, muted, mobile } = useSelector((store) => store.app)
 
   const handleMicrophone = () => {
     const audio = userMediaElement.current?.getTracks().find((track) => track.kind === 'audio')
@@ -55,15 +53,17 @@ export const Controls = () => {
         {button}
       </div>
       <div className={open ? 'controls-container' : 'controls-container-hidden'}>
-        <div className="controls-elements">
+        <div className="controls-elements" style={{ flexDirection: mobile ? 'column' : 'row' }}>
           <Button variant="outlined" style={{ color: '#333', border: '1px solid #333' }} onClick={navigateHandler}>
             BACK TO ROOMS
           </Button>
-          <div className="controls-element" style={{ color: blanked ? 'darkred' : '#333' }} onClick={handleCamera}>
-            {blanked ? <PiVideoCameraSlashDuotone /> : <PiVideoCameraDuotone />}
-          </div>
-          <div className="controls-element" style={{ color: muted ? 'darkred' : '#333' }} onClick={handleMicrophone}>
-            {muted ? <PiMicrophoneSlashDuotone /> : <PiMicrophoneDuotone />}
+          <div className="controls-buttons">
+            <div className="controls-element" style={{ color: blanked ? 'darkred' : '#333' }} onClick={handleCamera}>
+              {blanked ? <PiVideoCameraSlashDuotone /> : <PiVideoCameraDuotone />}
+            </div>
+            <div className="controls-element" style={{ color: muted ? 'darkred' : '#333' }} onClick={handleMicrophone}>
+              {muted ? <PiMicrophoneSlashDuotone /> : <PiMicrophoneDuotone />}
+            </div>
           </div>
           <Button variant="outlined" style={{ color: '#333', border: '1px solid #333' }} onClick={clipboardHandler}>
             COPY ROOM URL
